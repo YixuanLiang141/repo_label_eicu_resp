@@ -24,6 +24,7 @@ def process_columns_rename_time(data_file, output_file):
     df = pd.read_csv(data_file)
 
     # Remove spaces
+    df["labresulttext"] = df["labresulttext"].astype("string")
     df["labresulttext"] = df["labresulttext"].str.rstrip()
 
     # Remove O2 flow with %
@@ -40,6 +41,7 @@ def process_columns_rename_time(data_file, output_file):
     df.loc[mask, "labresulttext"] = df.loc[mask, "labresulttext"].str.lstrip(">")
     mask = df["labresulttext"].astype(str).str.startswith("<")
     df.loc[mask, "labresulttext"] = df.loc[mask, "labresulttext"].str.lstrip("<")
+    df["labresulttext"] = pd.to_numeric(df["labresulttext"], errors="coerce")
 
     df = df[["patientunitstayid", "labresultoffset", "labname", "labresulttext"]]
 
