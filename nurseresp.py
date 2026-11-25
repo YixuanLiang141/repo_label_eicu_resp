@@ -23,15 +23,11 @@ def process_columns_rename_time(data_file, output_file):
 
     df = pd.read_csv(data_file)
 
-    df = df[["patientunitstayid", "nursingchartoffset", "nursingchartcelltypevallabel", "nursingchartvalue"]]
+    df = df[["patientunitstayid", "nursingchartoffset", "nursingchartvalue"]]
 
     df.rename(columns={'patientunitstayid': 'stay_id'}, inplace=True)
     df.rename(columns={'nursingchartoffset': 'charttime'}, inplace=True)
-    df.rename(columns={'nursingchartcelltypevallabel': 'item'}, inplace=True)
     df.rename(columns={'nursingchartvalue': 'value'}, inplace=True)
-
-    mapping = {'O2 Saturation': 'SpO2'}
-    df["item"] = df["item"].map(mapping).fillna(df["item"])
 
     base_time = pd.Timestamp("2050-01-01 00:00:00")
     df['charttime'] = (
@@ -40,8 +36,9 @@ def process_columns_rename_time(data_file, output_file):
                           unit="min")
     ).dt.strftime("%Y-%m-%d %H:%M:%S")
 
+    df = df[["stay_id", "charttime", "value"]]
     df.to_csv(output_file, index=False)
-    print(f"输出文件保存至：{output_file}")
+    print(f"Done, result save to: {output_file}")
 
 def process_spo2(
     input_path="input.csv",

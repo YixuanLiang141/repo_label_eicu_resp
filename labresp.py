@@ -43,6 +43,20 @@ def process_columns_rename_time(data_file, output_file):
     df.loc[mask, "labresulttext"] = df.loc[mask, "labresulttext"].str.lstrip("<")
     df["labresulttext"] = pd.to_numeric(df["labresulttext"], errors="coerce")
 
+    # Process FiO2
+    mask = df["labname"] == 'FiO2'
+
+    df.loc[mask & df["labresulttext"].gt(0.2) & df["labresulttext"].le(1), "labresulttext"] *= 100
+
+    valid_mask = (
+        (df["labname"] != 'FiO2')
+        | (
+            df["labresulttext"].ge(20)
+            & df["labresulttext"].le(100)
+        )
+    )
+    df = df.loc[valid_mask]
+
     df = df[["patientunitstayid", "labresultoffset", "labname", "labresulttext"]]
 
     df.rename(columns={'patientunitstayid': 'stay_id'}, inplace=True)
